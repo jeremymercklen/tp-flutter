@@ -9,13 +9,12 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: appTitle,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurpleAccent),
         useMaterial3: true,
       ),
       home: const MyHomePage(title: appTitle),
@@ -23,13 +22,11 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
-
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
   final String title;
-  
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -41,15 +38,17 @@ class _MyHomePageState extends State<MyHomePage> {
   _sayHello(BuildContext context) {
     //if (!_validate()) return;
     if (!_formKey.currentState!.validate()) return;
-    _formKey.currentState?.save();
-    showDialog(context: context, builder: (BuildContext context) => AlertDialog(
-      content: MyText('Bonjour, $_name !'),
-      actions: [
-        ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const MyText('Merci !'))
-      ],
-    ));
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+              content: MyText('Bonjour, $_name !'),
+              actions: [
+                ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const MyText('Merci !'))
+              ],
+            ));
   }
 
   @override
@@ -65,8 +64,9 @@ class _MyHomePageState extends State<MyHomePage> {
             children: <Widget>[
               MyPadding(
                   child: TextFormField(
-                    onSaved: (value) => _name = value.toString(),
-                validator: (v) => stringNotEmptyValidator(v, 'Veuillez saisir un nom'),
+                onSaved: (value) => _name = value.toString(),
+                validator: (v) =>
+                    stringNotEmptyValidator(v, 'Veuillez saisir un nom'),
                 decoration: InputDecoration(hintText: 'Votre nom'),
               )),
               SizedBox(
