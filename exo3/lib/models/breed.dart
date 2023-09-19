@@ -171,9 +171,26 @@ class Breed {
 
   Breed.fromMap(Map<String, dynamic> map) {
     name = map['name'];
+    id = map['id'];
     description = map['description'];
     image = map['image'] != null ? new Image.fromJson(map['image']) : null;
   }
+
+  toMap() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['name'] = this.name;
+    data['description'] = this.description;
+    return data;
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Breed && runtimeType == other.runtimeType && id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
 class Weight {
