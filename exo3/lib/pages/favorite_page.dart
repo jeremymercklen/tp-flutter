@@ -35,8 +35,7 @@ class FavoritesPage extends StatelessWidget {
                                                 PageBreed(breed: favorite)));
                                   })
                             ]);
-                          }))),
-              const FavoritesBar()
+                          })))
             ])));
   }
 }
