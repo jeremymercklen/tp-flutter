@@ -2,9 +2,18 @@ import 'package:exo4/components.dart';
 import 'package:exo4/pages/signin_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../main.dart';
+import '../model/authentication_result.dart';
+import '../model/user_account.dart';
+import '../services/car_api.dart';
+import '../services/login_state.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  LoginPage({super.key});
+
+  final userRoutes = UserAccountRoutes();
 
   @override
   State<StatefulWidget> createState() => _LoginPage();
@@ -12,6 +21,29 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPage extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
+  late String _login;
+  late String _password;
+  var processLogin = false;
+  late Future<AuthenticationResult> _authResult;
+
+  _dologin() async {
+    if (!_formKey.currentState!.validate()) return;
+    _formKey.currentState?.save();
+    _authResult =
+        widget.userRoutes.authenticate(_login, _password).then((authResult) {
+      Provider.of<LoginState>(context, listen: false).token = authResult.token;
+      Provider.of<LoginState>(context, listen: false).user = UserAccount(
+          displayname: authResult.displayname, login: authResult.login);
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => MyHomePage(
+                title: 'Cars',
+              )));
+      return authResult;
+    });
+    setState(() {
+      processLogin = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,15 +58,39 @@ class _LoginPage extends State<LoginPage> {
                   Text('Cars', style: TextStyle(fontSize: 50)),
                   MySizedBox(
                       child: TextFormField(
+                          onChanged: (value) => _login = value.toString(),
                           decoration: InputDecoration(labelText: 'Login'),
                           validator: (v) {})),
                   MySizedBox(
                       child: TextFormField(
+                          onChanged: (value) => _password = value.toString(),
                           decoration: InputDecoration(labelText: 'Password'),
                           validator: (v) {},
                           obscureText: true)),
-                  MySizedBox(
-                      child: MyElevatedButton(onPressed: () {}, text: 'Login')),
+                  if (processLogin)
+                    FutureBuilder(
+                        future: _authResult,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            processLogin = false;
+                            final errorMessage =
+                                snapshot.error is StatusErrorException
+                                    ? "Invalid username or password"
+                                    : "Network error, please try again later";
+                            return Column(children: [
+                              MyText(errorMessage),
+                              MySizedBox(
+                                  child: MyElevatedButton(
+                                      onPressed: () => _dologin(),
+                                      text: 'Login'))
+                            ]);
+                          }
+                          return Center(child: CircularProgressIndicator());
+                        })
+                  else
+                    MySizedBox(
+                        child: MyElevatedButton(
+                            onPressed: () => _dologin(), text: 'Login')),
                   MySizedBox(
                       child: MyElevatedButton(
                           onPressed: () {

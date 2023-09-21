@@ -16,3 +16,19 @@ String? stringNotEmptyValidator(value, message) {
   }
   return null;
 }
+
+class MyText extends Text {
+  const MyText(super.data, {super.key});
+}
+
+showNetworkErrorDialog(context, {message}) => showDialog(
+    context: context,
+    builder: (BuildContext context) => AlertDialog(
+          content:
+              MyText(message ?? 'Error while communicating with the server'),
+          actions: [
+            ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: MyText('OK'))
+          ],
+        ));
