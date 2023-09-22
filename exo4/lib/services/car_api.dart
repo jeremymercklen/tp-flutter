@@ -5,12 +5,15 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 import '../model/authentication_result.dart';
+import '../model/car.dart';
 import 'login_state.dart';
 
 class StatusErrorException {
-  final int statusCode;
+  final int _statusCode;
 
-  const StatusErrorException(this.statusCode);
+  const StatusErrorException(this._statusCode);
+
+  get statusCode => _statusCode;
 }
 
 class CarAPI {
@@ -47,14 +50,44 @@ class UserAccountRoutes extends CarAPI {
     return AuthenticationResult.fromMap(datas);
   }
 
-  Future refreshToken(context) async {
+  Future<String> refreshToken(context) async {
     var token = Provider.of<LoginState>(context, listen: false).token;
     var result = await http.get(
         Uri.http(CarAPI.apiServer, '$userAccountRoutes/refreshtoken'),
-        headers: {'Authorization': 'Bearer a$token'});
+        headers: {'Authorization': 'Bearer $token'});
     if (result.statusCode == 200)
-      return jsonDecode(result.body);
+      return jsonDecode(result.body)["token"];
     else
       throw StatusErrorException(result.statusCode);
+  }
+}
+
+class CarRoutes extends CarAPI {
+  static const carRoutes = '${CarAPI.apiUrl}/car';
+  var userRoutes = UserAccountRoutes();
+
+  Future<List<Car>> get(context) async {
+    List<Car> cars = [];
+
+    try {
+      var value = await userRoutes.refreshToken(context);
+      Provider.of<LoginState>(context, listen: false).token = value;
+
+      //var token = Provider.of<LoginState>(context, listen: false).token;
+      var result = await http.get(Uri.http(CarAPI.apiServer, '$carRoutes'),
+          headers: {'Authorization': 'Bearer $value'});
+      if (result.statusCode == 200) {
+        var datas = jsonDecode(result.body);
+        for (var data in datas) {
+          var car = Car.fromMap(data);
+          cars.add(car);
+        }
+      }
+    } on StatusErrorException catch (error) {
+      if ((error.statusCode == 401))
+        Provider.of<LoginState>(context, listen: false).disconnect();
+    }
+    ;
+    return cars;
   }
 }

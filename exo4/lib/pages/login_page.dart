@@ -60,12 +60,14 @@ class _LoginPage extends State<LoginPage> {
                       child: TextFormField(
                           onChanged: (value) => _login = value.toString(),
                           decoration: InputDecoration(labelText: 'Login'),
-                          validator: (v) {})),
+                          validator: (value) => stringNotEmptyValidator(
+                              value, 'Please enter a Login'))),
                   MySizedBox(
                       child: TextFormField(
                           onChanged: (value) => _password = value.toString(),
                           decoration: InputDecoration(labelText: 'Password'),
-                          validator: (v) {},
+                          validator: (value) => stringNotEmptyValidator(
+                              value, 'Please enter a Login'),
                           obscureText: true)),
                   if (processLogin)
                     FutureBuilder(
