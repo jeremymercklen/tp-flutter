@@ -6,8 +6,7 @@ class Car {
   late var builddate;
   late var useraccount_id;
 
-  Car(this.make, this.model, this.isrunning, this.price, this.builddate,
-      this.useraccount_id);
+  Car(this.make, this.model, this.isrunning, this.price, this.builddate);
 
   Car.fromMap(Map<String, dynamic> map) {
     make = map['make'];

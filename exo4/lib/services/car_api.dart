@@ -90,4 +90,10 @@ class CarRoutes extends CarAPI {
     ;
     return cars;
   }
+
+  Future insert(Car car, context) async {
+    var token = Provider.of<LoginState>(context, listen: false).token;
+    await http.post(Uri.http(CarAPI.apiServer, carRoutes),
+        headers: {'Authorization': 'Bearer $token'}, body: car);
+  }
 }
